@@ -1,4 +1,4 @@
-#include "Command.h"
+﻿#include "Command.h"
 
 void  toUpperCase(std::string& str)
 {
@@ -19,7 +19,12 @@ vector<string> Command::getListCommand() {
 	v.push_back("COUNT          Start child.exe.");
 	v.push_back("CLEAR          Clear the screen.");
 	v.push_back("MKFILE         Create file.");
+	v.push_back("EXE            Execute program.");
 	return v;
+}
+
+vector<string> Command::getTutorial() {
+	return tutorial;
 }
 
 vector<string> Command::getCommand() {
@@ -27,7 +32,13 @@ vector<string> Command::getCommand() {
 }
 
 void Command::help(string data) {
-	if (data == "") {
+	if (data != "") {
+		toUpperCase(data);
+		vector<string> command = getCommand();
+		for (int i = 0; i < command.size();++i) if (data == command[i]) {
+			cout << getTutorial()[i] << endl;
+			return;
+		}
 		cout << "syntax error";
 		return;
 	}
@@ -59,9 +70,68 @@ void Command::ClearScreen()
 	FillConsoleOutputCharacter(hOutput, ' ', info.dwSize.X * info.dwSize.Y, COORD{ 0, 0 }, &written);
 	SetCursorPosition(0, 0);
 }
+void Command::dir(string path){
+	int cn = 0;
+	string search_path = "C:\\Users\\trand";
+	WIN32_FIND_DATA fd;
+	HANDLE hFind = ::FindFirstFile((LPCWSTR)search_path.c_str(), &fd);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				cout << fd.cFileName << "\t";
+				cn++;
+				if (cn % 5 == 0) cout << endl;
+			}
+		} while (::FindNextFile(hFind, &fd));
+		::FindClose(hFind);
+	}
+	cout << endl;
+}
+void Command::startProgram(LPCSTR lpApplicationName){
+	// additional information
+	STARTUPINFOA si;
+	PROCESS_INFORMATION pi;
+
+	// set the size of the structures
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+
+	// start the program up
+	CreateProcessA
+	(
+		lpApplicationName,   // the path
+		NULL,                // Command line// tham số dòng lệnh
+		NULL,                   // Process handle not inheritable
+		NULL,                   // Thread handle not inheritable
+		FALSE,                  // Set handle inheritance to FALSE
+		CREATE_NEW_CONSOLE,     // Opens file in a separate console
+		NULL,           // Use parent's environment block
+		NULL,           // Use parent's starting directory 
+		&si,            // Pointer to STARTUPINFO structure
+		&pi           // Pointer to PROCESS_INFORMATION structure
+		);
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+}
+void Command::exe(string applicationName){
+	startProgram(applicationName.c_str());
+}
+void Command::date(){
+	time_t now = time(0);
+	char dt[26];
+	ctime_s(dt, sizeof(dt), &now);
+	cout << "The local date and time is: " << dt << endl;
+	tm gmtm;
+	gmtime_s(&gmtm, &now);
+	asctime_s(dt, sizeof dt, &gmtm);
+	cout << "The UTC date and time is:" << dt << endl;
+}
 void Command::syntax(string command) {
 	string prefix = command.substr(0, command.find_first_of(' '));
-	string data = command.substr(command.find_first_of(' ') + 1,command.length());
+	string data = "";
+	if (command.find_first_of(' ')!=-1) 
+	data = command.substr(command.find_first_of(' ') + 1,command.length());
 	toUpperCase(prefix);
 	vector<string> commands = getCommand();
 	int pos = -1;
@@ -74,11 +144,18 @@ void Command::syntax(string command) {
 	case 0:
 		echo(data); break;
 	case 1:
+		cout << "Bye bye" << endl;
 		exit(0); break;
 	case 2:
 		help(data); break;
+	case 3:
+		dir(data); break;
+	case 4:
+		date(); break;
 	case 7:
 		ClearScreen(); break;
+	case 9:
+		exe(data); break;
 	default: "syntax error";
 		break;
 	}

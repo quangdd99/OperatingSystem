@@ -1,5 +1,4 @@
 ﻿  Command.cpp
-C:\Users\trand\source\repos\Shell\Shell\Command.cpp(65,20): warning C4018: '<': signed/unsigned mismatch
-  Shell.cpp
-  Generating Code...
-  Shell.vcxproj -> C:\Users\trand\source\repos\Shell\Debug\Shell.exe
+C:\Users\trand\source\repos\OperatingSystem\Shell\Shell\Command.cpp(38,21): warning C4018: '<': signed/unsigned mismatch
+C:\Users\trand\source\repos\OperatingSystem\Shell\Shell\Command.cpp(138,20): warning C4018: '<': signed/unsigned mismatch
+  Shell.vcxproj -> C:\Users\trand\source\repos\OperatingSystem\Shell\Debug\Shell.exe
